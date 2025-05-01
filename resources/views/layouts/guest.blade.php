@@ -18,7 +18,12 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                    <!-- Icône SVG éducative -->
+                    <svg class="w-20 h-20 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M12 2L2 9l10 7 10-7L12 2zm0 18v-7m-6 2l6 4 6-4" />
+                    </svg>
                 </a>
             </div>
 

@@ -25,22 +25,22 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::define('is-admin', function (User $user) {
-            return $user->role->id === '1';
+            return $user->role_id === 1;
         });
 
         Gate::define('is-enseignant', function (User $user) {
-            return $user->role->id === '3';
+            return $user->role_id === 3;
         });
 
         Gate::define('is-etudiant', function (User $user) {
-            return $user->role->id === '2';
+            return $user->role_id === 2;
         });
         // Gate::define('manage-videos', function (User $user) {
         //     return $user->role->id === 3;
         // });
-        // Gate::define('manage-videos', function ($user) {
-        //     return $user->role_id == 1 || $user->role_id == 3; // 1=admin, 2=enseignant
-        // });
+        Gate::define('manage-videos', function ($user) {
+            return $user->role_id == 1 || $user->role_id == 3; // 1=admin, 2=enseignant
+        });
     }
 }
 

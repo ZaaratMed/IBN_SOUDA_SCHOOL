@@ -19,11 +19,16 @@ class VideoController extends Controller
     public function index()
 {
     $videos = Video::all();
+    // dd(auth()->user());
+    // dd(Gate::abilities()); // Vérifie toutes les Gates enregistrées
     return view('videos.index', compact('videos'));
 }
 
     public function create()
 {   
+    if (!Gate::allows('manage-videos')) {
+        abort(403, 'Unauthorized action.');
+    }
     // $user = Auth::user();
     // dd($user->role->nom);
     // dd(auth()->user()->role->nom, Gate::allows('manage-videos'));
@@ -35,15 +40,24 @@ class VideoController extends Controller
     // }
     return view('videos.create');
 }
-    public function store(Request $request)
-{
-    
+public function store(Request $request)
+{   
+    if (!Gate::allows('manage-videos')) {
+        abort(403, 'Unauthorized action.');
+    }
+    // Validation des données
     $request->validate([
         'titre' => 'required|string|max:255',
         'description' => 'nullable|string',
-        'url' => 'required|mimes:mp4,avi,mov' ,// |max:10240, // Taille maximale 10MB
+        'url' => 'required|mimes:mp4,avi,mov', // Taille maximale peut être ajoutée |max:10240 (10MB)
         'niveau' => 'required|string|max:255'
     ]);
+
+    // Vérifier si l'utilisateur connecté est un enseignant
+    // if (!auth()->user()->enseignant) {
+    //     return redirect()->back()->withErrors(['error' => 'Seul un enseignant peut ajouter une vidéo.']);
+    // }
+    // dd(auth()->user()->enseignant);
 
     // Upload du fichier vidéo
     $videoPath = $request->file('url')->store('videos', 'public');
@@ -54,24 +68,31 @@ class VideoController extends Controller
     $video->description = $request->input('description');
     $video->niveau = $request->input('niveau');
     $video->url = $videoPath;
-    $video->enseignant_id = 1;
+
+    // Affecter l'enseignant authentifié
+    $video->enseignant_id = auth()->user()->enseignant->id;
 
     $video->save();
+    // dd($request->all());
 
-    return redirect()->route('videos')->with('success', 'Vidéo ajoutée avec succès');
+    return redirect()->route('videos.index')->with('success', 'Vidéo ajoutée avec succès');
 }
+
 
 public function edit($id)
 {
-    // if (Gate::denies('manage-videos')) {
-    //     abort(403, 'Unauthorized action.');
-    // }
+    if (!Gate::allows('manage-videos')) {
+        abort(403, 'Unauthorized action.');
+    }
     $video = Video::findOrFail($id);
     return view('videos.edit', compact('video'));
 }
 
 public function update(Request $request, $id)
 {
+    if (!Gate::allows('manage-videos')) {
+        abort(403, 'Unauthorized action.');
+    }
     $request->validate([
         'titre' => 'required|string|max:255',
         'description' => 'nullable|string',
@@ -95,17 +116,20 @@ public function update(Request $request, $id)
 
     $video->save();
 
-    return redirect()->route('videos')->with('success', 'Vidéo mise à jour avec succès');
+    return redirect()->route('videos.index')->with('success', 'Vidéo mise à jour avec succès');
 }
 
 public function destroy($id)
 {
+    if (!Gate::allows('manage-videos')) {
+        abort(403, 'Unauthorized action.');
+    }
     $video = Video::findOrFail($id);
     // Storage::delete('public/' . $video->url);
     Storage::disk('public')->delete($video->url);
     $video->delete();
 
-    return redirect()->route('videos')->with('success', 'Vidéo supprimée avec succès');
+    return redirect()->route('videos.index')->with('success', 'Vidéo supprimée avec succès');
 }
 
 

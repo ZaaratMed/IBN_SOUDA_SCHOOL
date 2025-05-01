@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Enseignant extends Model
 {
-    protected $fillable = ['utilisateur_id', 'matiere_id'];
+    protected $fillable = ['user_id', 'matiere_id'];
 
-    public function users()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }

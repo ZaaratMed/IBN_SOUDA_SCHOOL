@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Role;
+use App\Models\Matiere;
 use App\Models\Enseignant;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,7 +24,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id'
     ];
+    protected $casts = [
+        'role_id' => 'integer',
+    ];
+    
 
     public function role()
     {
@@ -33,6 +39,11 @@ class User extends Authenticatable
     {
         return $this->hasOne(Enseignant::class);
     }
+    public function matieres()
+{
+    return $this->belongsToMany(Matiere::class, 'etudiant_matiere', 'etudiant_id', 'matiere_id');
+}
+
     public function isAdmin()
     {
         return $this->role->nom === 'admin';
